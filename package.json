@@ -1,8 +1,10 @@
 {
-  "name": "cscurlyformatter",
-	"displayName": "C# curlies fix",
+  	"name": "cscurlyformatter",
+	"displayName": "C# curly formatter",
 	"description": "Forces curly brackets on new line in C#.",
 	"version": "0.0.1",
+	"publisher": "Ironcutter24",
+	"icon": "icon.png",
 	"engines": {
 		"vscode": "^1.62.0"
 	},

@@ -12,13 +12,13 @@ Object.freeze(Cursor);
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	//console.log('Congratulations, your extension "C# curlies fix" is now active!');
+	//console.log('Congratulations, your extension is now active!');
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('cscurlyformatter.curlyformat', () => {
-		//vscode.window.showInformationMessage('C# curlies fix started!');
+		//vscode.window.showInformationMessage('Extension started!');
 	
 		if(isCursorBetweenCurly())
 			manualFormat();
@@ -52,18 +52,22 @@ function isCursorBetweenCurly(){
 
 function manualFormat() {
 	vscode.commands.executeCommand(Cursor.Left);
-	vscode.commands.executeCommand('type', { "text": "\n" });
+	type('\n');
 
 	vscode.commands.executeCommand(Cursor.Right);
-	vscode.commands.executeCommand('type', { "text": "\n\n" });
+	type('\n\n');
 
 	vscode.commands.executeCommand(Cursor.Up);
-	vscode.commands.executeCommand('type', { "text": "\t" });
+	type('\t');
 }
 
 function autoFormat() {
-	vscode.commands.executeCommand('type', { "text": "\n" });
+	type('\n');
 	vscode.commands.executeCommand("editor.action.formatDocument");
 
 	// Find async way to type "\t" after format completion
+}
+
+function type(text : string) {
+	vscode.commands.executeCommand('type', { "text": text });
 }
