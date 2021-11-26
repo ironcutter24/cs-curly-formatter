@@ -1,4 +1,5 @@
 import { moveCursor } from 'readline';
+import { start } from 'repl';
 import * as vscode from 'vscode';
 
 const Cursor = {
@@ -12,18 +13,23 @@ Object.freeze(Cursor);
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	//console.log('Congratulations, your extension is now active!');
+		//console.log('Congratulations, your extension is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('cscurlyformatter.curlyformat', () => {
+		// The command has been defined in the package.json file
+		// Now provide the implementation of the command with registerCommand
+		// The commandId parameter must match the command field in package.json
+		let disposable = vscode.commands.registerCommand('cscurlyformatter.curlyformat', () => {
 		//vscode.window.showInformationMessage('Extension started!');
 	
-		if(isCursorBetweenCurly())
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			return false;
+		}
+
+		if(isCursorBetweenCurly(editor))
 			manualFormat();
 		else
-			vscode.commands.executeCommand('type', { "text": "\n" });
+			newLineAndTab(editor);
 	});
 
 	context.subscriptions.push(disposable);
@@ -32,17 +38,24 @@ export function activate(context: vscode.ExtensionContext) {
 // this method is called when your extension is deactivated
 export function deactivate() {}
 
-function isCursorBetweenCurly(){
-	const editor = vscode.window.activeTextEditor;
-	if (!editor) {
-		return false;
-	}
-	const cursorPosition = editor.selection.active;
-	const nearCursor = editor.document.getText(
-		new vscode.Range(
-			cursorPosition.line, cursorPosition.character - 1,
-			cursorPosition.line, cursorPosition.character + 1
-		));
+function manualFormat() {
+	vscode.commands.executeCommand(Cursor.Left);
+	type('\n');
+	vscode.commands.executeCommand(Cursor.Right);
+	type('\n\n');
+	vscode.commands.executeCommand(Cursor.Up);
+	type('\t');
+}
+
+function newLineAndTab(editor : vscode.TextEditor){
+	type('\n');
+	const lineToCursor = getLineToCursor(editor);
+	vscode.commands.executeCommand("deleteAllLeft");
+	type(lineToCursor);
+}
+
+function isCursorBetweenCurly(editor : vscode.TextEditor){
+	const nearCursor = getAdjacentText(editor);
 
 	if(nearCursor[0] == "{" && nearCursor[1] == "}")
 		return true;
@@ -50,22 +63,23 @@ function isCursorBetweenCurly(){
 		return false;
 }
 
-function manualFormat() {
-	vscode.commands.executeCommand(Cursor.Left);
-	type('\n');
+function getAdjacentText(editor : vscode.TextEditor) {
+	const cursorPosition = editor.selection.active;
 
-	vscode.commands.executeCommand(Cursor.Right);
-	type('\n\n');
-
-	vscode.commands.executeCommand(Cursor.Up);
-	type('\t');
+	return editor.document.getText(
+		vsRange(cursorPosition.line, cursorPosition.character -1, cursorPosition.character + 1)
+	);
 }
 
-function autoFormat() {
-	type('\n');
-	vscode.commands.executeCommand("editor.action.formatDocument");
+function getLineToCursor(editor : vscode.TextEditor) {
+	const cursorPosition = editor.selection.active;
+	return editor.document.getText(
+		vsRange(cursorPosition.line, 0, cursorPosition.character)
+	);
+}
 
-	// Find async way to type "\t" after format completion
+function vsRange(line : number, from : number, to : number){
+	return new vscode.Range(line, from, line, to);
 }
 
 function type(text : string) {
