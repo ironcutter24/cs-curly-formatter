@@ -26,10 +26,13 @@ export function activate(context: vscode.ExtensionContext) {
 			return false;
 		}
 
-		if(isCursorBetweenCurly(editor))
+		if(!isCursorAtZeroPosition(editor) && isCursorBetweenCurly(editor)){
 			manualFormat();
-		else
-			newLineAndTab(editor);
+		}
+		else{
+			//newLineAndTab(editor);
+			type('\n');
+		}
 	});
 
 	context.subscriptions.push(disposable);
@@ -49,7 +52,7 @@ function manualFormat() {
 
 function newLineAndTab(editor : vscode.TextEditor){
 	type('\n');
-	const lineToCursor = getLineToCursor(editor);
+	var lineToCursor = getLineToCursor(editor);
 	vscode.commands.executeCommand("deleteAllLeft");
 	type(lineToCursor);
 }
@@ -61,6 +64,11 @@ function isCursorBetweenCurly(editor : vscode.TextEditor){
 		return true;
 	else
 		return false;
+}
+
+function isCursorAtZeroPosition(editor : vscode.TextEditor) {
+	const cursorPosition = editor.selection.active;
+	return cursorPosition.character == 0;
 }
 
 function getAdjacentText(editor : vscode.TextEditor) {

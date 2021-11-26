@@ -2,7 +2,7 @@
   	"name": "cscurlyformatter",
 	"displayName": "C# Curly Formatter",
 	"description": "C# formatting fixes collection.",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"publisher": "Ironcutter24",
 	"icon": "icon.png",
 	"engines": {
@@ -19,7 +19,7 @@
 		"commands": [
 			{
 				"command": "cscurlyformatter.curlyformat",
-				"title": "Curly format"
+				"title": "Curly Format"
 			}
 		],
 		"keybindings": [
