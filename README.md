@@ -1,2 +1,4 @@
-# C# curly formatter
- Forces curly brackets on new line in C#.
+# C# Curly Formatter
+Maps 'enter' to formatting functions:
+1. Forces curly brackets on new line
+2. Auto-tab on new lines
