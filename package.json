@@ -1,7 +1,7 @@
 {
   	"name": "cscurlyformatter",
-	"displayName": "C# curly formatter",
-	"description": "Maps 'enter' to formatting snippets:\n\t1. force curly brackets on new line,\n\t2. auto-tab on all new lines.",
+	"displayName": "C# Curly Formatter",
+	"description": "C# formatting fixes collection.",
 	"version": "0.0.2",
 	"publisher": "Ironcutter24",
 	"icon": "icon.png",
@@ -9,7 +9,7 @@
 		"vscode": "^1.62.0"
 	},
 	"categories": [
-		"Other"
+		"Snippets", "Formatters", "Keymaps"
 	],
 	"activationEvents": [
         "onCommand:cscurlyformatter.curlyformat"
