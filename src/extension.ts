@@ -10,35 +10,29 @@ const Cursor = {
 };
 Object.freeze(Cursor);
 
-// this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-		//console.log('Congratulations, your extension is now active!');
+		//console.log('Your extension is now active!');
 
-		// The command has been defined in the package.json file
-		// Now provide the implementation of the command with registerCommand
 		// The commandId parameter must match the command field in package.json
 		let disposable = vscode.commands.registerCommand('cscurlyformatter.curlyformat', () => {
-		//vscode.window.showInformationMessage('Extension started!');
 	
-		const editor = vscode.window.activeTextEditor;
+		var editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			return false;
 		}
 
-		if(!isCursorAtZeroPosition(editor) && isCursorBetweenCurly(editor)){
+		if(!isCursorAtZeroPosition(editor) && isCursorBetweenCurly(editor)) {
 			manualFormat();
 		}
-		else{
-			//newLineAndTab(editor);
-			type('\n');
+		else {
+			newLineAndTab(editor);
 		}
 	});
 
 	context.subscriptions.push(disposable);
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {}
 
 function manualFormat() {
@@ -50,25 +44,32 @@ function manualFormat() {
 	type('\t');
 }
 
-function newLineAndTab(editor : vscode.TextEditor){
+function newLineAndTab(editor : vscode.TextEditor) {
 	type('\n');
-	var lineToCursor = getLineToCursor(editor);
-	vscode.commands.executeCommand("deleteAllLeft");
-	type(lineToCursor);
+	indent();
 }
 
-function isCursorBetweenCurly(editor : vscode.TextEditor){
+function type(text : string) {
+	vscode.commands.executeCommand('type', { "text": text });
+}
+
+function indent() {
+	vscode.commands.executeCommand("indent");
+	vscode.commands.executeCommand("editor.action.indentationToTabs");
+}
+
+function isCursorAtZeroPosition(editor : vscode.TextEditor) {
+	const cursorPosition = editor.selection.active;
+	return cursorPosition.character == 0;
+}
+
+function isCursorBetweenCurly(editor : vscode.TextEditor) {
 	const nearCursor = getAdjacentText(editor);
 
 	if(nearCursor[0] == "{" && nearCursor[1] == "}")
 		return true;
 	else
 		return false;
-}
-
-function isCursorAtZeroPosition(editor : vscode.TextEditor) {
-	const cursorPosition = editor.selection.active;
-	return cursorPosition.character == 0;
 }
 
 function getAdjacentText(editor : vscode.TextEditor) {
@@ -79,17 +80,6 @@ function getAdjacentText(editor : vscode.TextEditor) {
 	);
 }
 
-function getLineToCursor(editor : vscode.TextEditor) {
-	const cursorPosition = editor.selection.active;
-	return editor.document.getText(
-		vsRange(cursorPosition.line, 0, cursorPosition.character)
-	);
-}
-
-function vsRange(line : number, from : number, to : number){
+function vsRange(line : number, from : number, to : number) {
 	return new vscode.Range(line, from, line, to);
-}
-
-function type(text : string) {
-	vscode.commands.executeCommand('type', { "text": text });
 }
