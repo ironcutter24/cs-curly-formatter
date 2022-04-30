@@ -28,7 +28,17 @@
 				"command": "cscurlyformatter.curlyformat",
 				"when": "editorLangId == csharp && editorTextFocus"
 			}
-		]
+		],
+		"configuration": {
+			"title": "Curly Formatter",
+			"properties": {
+				"cscurlyformatter.automaticTabIntendationEnabled": {
+					"type": "boolean",
+					"description": "Enable automatic tab intendation style",
+					"default": true
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

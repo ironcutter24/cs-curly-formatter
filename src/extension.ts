@@ -61,7 +61,10 @@ function manualFormat() {
 
 function newLineAndTab(editor : vscode.TextEditor) {
 	type('\n');
-	vscode.commands.executeCommand("editor.action.indentationToTabs");
+	const automaticTabIndent = vscode.workspace.getConfiguration("cscurlyformatter").get("automaticTabIntendationEnabled");
+	if (automaticTabIndent) {
+		vscode.commands.executeCommand("editor.action.indentationToTabs");
+	}
 }
 
 function type(text : string) {
