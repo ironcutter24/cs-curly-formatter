@@ -1,5 +1,3 @@
-import { moveCursor } from 'readline';
-import { start } from 'repl';
 import * as vscode from 'vscode';
 
 const Cursor = {
@@ -21,8 +19,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 		if(!isCursorAtZeroPosition(editor) && isCursorBetweenCurly(editor))
 			manualFormat();
-		else
-			newLineAndTab(editor);
+        else {
+            type('\n');
+            convertIndentation();
+        }
 	});
 	context.subscriptions.push(disposable);
 }
@@ -56,15 +56,33 @@ function manualFormat() {
 	move(Cursor.Right);
 	type('\n\n');
 	move(Cursor.Up);
-	type('\t');
+    indent();
 }
 
-function newLineAndTab(editor : vscode.TextEditor) {
-	type('\n');
-	const automaticTabIndent = vscode.workspace.getConfiguration("cscurlyformatter").get("automaticTabIntendationEnabled");
-	if (automaticTabIndent) {
-		vscode.commands.executeCommand("editor.action.indentationToTabs");
-	}
+function indent() {
+    if (hasAutoTab())
+        type('\t');
+    else {
+        const app = vscode.workspace.getConfiguration("editor").get<number>("tabSize");
+        var tabSize = 4;
+
+        if (typeof app === "number")
+            tabSize = app;
+
+        for (var i = 0; i < tabSize; i++)
+            type(' ');
+    }
+}
+
+function convertIndentation() {
+    if (hasAutoTab())
+        vscode.commands.executeCommand("editor.action.indentationToTabs");
+    else
+        vscode.commands.executeCommand("editor.action.indentationToSpaces");
+}
+
+function hasAutoTab() {
+    return vscode.workspace.getConfiguration("cscurlyformatter").get("autoTabIndentation");
 }
 
 function type(text : string) {
