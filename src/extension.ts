@@ -1,3 +1,4 @@
+import { config, env } from 'process';
 import * as vscode from 'vscode';
 
 const Cursor = {
@@ -16,6 +17,11 @@ export function activate(context: vscode.ExtensionContext) {
 		var editor = vscode.window.activeTextEditor;
 		if (!editor)
 			return false;
+        
+        if (hasSuggestionOnEnter() && hasSuggestWidget()) {
+            vscode.commands.executeCommand("acceptSelectedSuggestion");
+            return;
+        }
 
 		if(!isCursorAtZeroPosition(editor) && isCursorBetweenCurly(editor))
 			manualFormat();
@@ -83,6 +89,15 @@ function convertIndentation() {
 
 function hasAutoTab() {
     return vscode.workspace.getConfiguration("cscurlyformatter").get("autoTabIndentation");
+}
+
+function hasSuggestionOnEnter() {
+    return vscode.workspace.getConfiguration("editor").get("acceptSuggestionOnEnter");
+}
+
+function hasSuggestWidget() {
+    // "when": "suggestWidgetVisible"
+    return false;
 }
 
 function type(text : string) {
