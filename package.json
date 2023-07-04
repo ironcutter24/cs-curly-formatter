@@ -6,15 +6,12 @@
   	"publisher": "Ironcutter24",
   	"icon": "icon.png",
   	"engines": {
-  	  	"vscode": "^1.62.0"
+  	  	"vscode": "^1.75.0"
   	},
   	"categories": [
   	  	"Snippets",
   	  	"Formatters",
   	  	"Keymaps"
-  	],
-  	"activationEvents": [
-  	  	"onCommand:cscurlyformatter.curlyformat"
   	],
   	"main": "./out/extension.js",
   	"contributes": {
