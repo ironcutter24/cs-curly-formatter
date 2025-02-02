@@ -1,8 +1,8 @@
 {
-  	"name": "cscurlyformatter",
-  	"displayName": "C# Curly Formatter",
-  	"description": "C# formatting fixes collection.",
-  	"version": "0.0.7",
+  	"name": "curlyformatter",
+  	"displayName": "Curly Formatter",
+  	"description": "Curly braces on a new line fix with support for all languages.",
+  	"version": "1.0.0",
   	"publisher": "Ironcutter24",
   	"icon": "icon.png",
   	"engines": {
@@ -17,25 +17,31 @@
   	"contributes": {
   	  	"commands": [
   	  	  	{
-  	  	  	  	"command": "cscurlyformatter.curlyformat",
-  	  	  	  	"title": "Curly Format"
+  	  	  	  	"command": "curlyformatter.formatCurlyBracesOnNewLine",
+  	  	  	  	"title": "Format Curly Braces On New Line"
   	  	  	}
   	  	],
   	  	"keybindings": [
   	  	  	{
   	  	  	  	"key": "enter",
-  	  	  	  	"command": "cscurlyformatter.curlyformat",
-  	  	  	  	"when": "editorLangId == csharp && editorTextFocus"
+  	  	  	  	"command": "curlyformatter.formatCurlyBracesOnNewLine",
+  	  	  	  	"when": "editorTextFocus"
   	  	  	}
   	  	],
   	  	"configuration": {
-  	  	  	"title": "C# Curly Formatter",
+  	  	  	"title": "Curly Formatter",
   	  	  	"properties": {
-  	  	  	  	"cscurlyformatter.autoTabIndentation": {
+  	  	  	  	"curlyformatter.autoTabIndentation": {
+                    "description": "Enable automatic tab intendation style",
   	  	  	  	  	"type": "boolean",
-  	  	  	  	  	"description": "Enable automatic tab intendation style",
   	  	  	  	  	"default": true
-  	  	  	  	}
+  	  	  	  	},
+                "curlyformatter.languages": {
+                    "description": "Languages to format",
+                    "type": "array",
+                    "items": "string",
+                    "default": ["c", "cpp", "csharp"]
+                }
   	  	  	}
   	  	}
   	},

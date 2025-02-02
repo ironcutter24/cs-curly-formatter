@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 
+const extensionName = "curlyformatter";
+
 enum CursorDirection {
     up = "cursorUp",
     down = "cursorDown",
@@ -9,17 +11,17 @@ enum CursorDirection {
 
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-    // Retrieve VSCode configuration
-    getConfig();
 
     // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('cscurlyformatter.curlyformat', () => {
+    let disposable = vscode.commands.registerCommand(extensionName + ".formatCurlyBracesOnNewLine", () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
             return false;            
         }
 
-        if (!isCursorAtZeroPosition(editor) && isCursorBetweenCurly(editor)) {
+        if (getLanguages().includes(editor.document.languageId)
+            && !isCursorAtZeroPosition(editor)
+            && isCursorBetweenCurly(editor)) {
             manualFormat();   
         }
         else {
@@ -89,12 +91,16 @@ async function execute(cmd: string) {
 // Configuration //
 // ************* //
 
+function getLanguages() {
+    return getConfig().get<string[]>(extensionName + ".languages") || [];
+}
+
 function getTabSize() {
     return getConfig().get<number>("editor.tabSize") ?? 4;
 }
 
 function hasAutoTab() {
-    return getConfig().get<boolean>("cscurlyformatter.autoTabIndentation") ?? false;
+    return getConfig().get<boolean>(extensionName + ".autoTabIndentation") ?? false;
 }
 
 function hasSuggestionOnEnter() {
