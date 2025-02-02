@@ -1,5 +1,5 @@
 {
-  	"name": "curlyformatter",
+  	"name": "cscurlyformatter",
   	"displayName": "Curly Formatter",
   	"description": "Curly braces on a new line fix with support for all languages.",
   	"version": "1.0.0",
@@ -17,26 +17,26 @@
   	"contributes": {
   	  	"commands": [
   	  	  	{
-  	  	  	  	"command": "curlyformatter.formatCurlyBracesOnNewLine",
+  	  	  	  	"command": "cscurlyformatter.formatCurlyBracesOnNewLine",
   	  	  	  	"title": "Format Curly Braces On New Line"
   	  	  	}
   	  	],
   	  	"keybindings": [
   	  	  	{
   	  	  	  	"key": "enter",
-  	  	  	  	"command": "curlyformatter.formatCurlyBracesOnNewLine",
+  	  	  	  	"command": "cscurlyformatter.formatCurlyBracesOnNewLine",
   	  	  	  	"when": "editorTextFocus"
   	  	  	}
   	  	],
   	  	"configuration": {
   	  	  	"title": "Curly Formatter",
   	  	  	"properties": {
-  	  	  	  	"curlyformatter.autoTabIndentation": {
+  	  	  	  	"cscurlyformatter.autoTabIndentation": {
                     "description": "Enable automatic tab intendation style",
   	  	  	  	  	"type": "boolean",
   	  	  	  	  	"default": true
   	  	  	  	},
-                "curlyformatter.languages": {
+                "cscurlyformatter.languages": {
                     "description": "Languages to format",
                     "type": "array",
                     "items": "string",

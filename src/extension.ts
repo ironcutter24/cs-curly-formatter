@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-const extensionName = "curlyformatter";
+const extensionName = "cscurlyformatter";
 
 enum CursorDirection {
     up = "cursorUp",
