@@ -1,8 +1,8 @@
 {
   	"name": "cscurlyformatter",
   	"displayName": "Curly Formatter",
-  	"description": "Curly braces on a new line fix with support for all languages.",
-  	"version": "1.0.0",
+  	"description": "Universal solution to fix curly braces indentation.",
+  	"version": "1.0.1",
   	"publisher": "Ironcutter24",
   	"icon": "icon.png",
   	"engines": {
