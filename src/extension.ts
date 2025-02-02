@@ -1,109 +1,132 @@
 import * as vscode from 'vscode';
 
-const Cursor = {
-    Up: "cursorUp",
-    Down: "cursorDown",
-    Left: "cursorLeft",
-    Right: "cursorRight"
-};
-Object.freeze(Cursor);
+enum CursorDirection {
+    up = "cursorUp",
+    down = "cursorDown",
+    left = "cursorLeft",
+    right = "cursorRight"
+}
 
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+    // Retrieve VSCode configuration
+    getConfig();
 
     // The commandId parameter must match the command field in package.json
     let disposable = vscode.commands.registerCommand('cscurlyformatter.curlyformat', () => {
-        var editor = vscode.window.activeTextEditor;
-        if (!editor)
-            return false;
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return false;            
+        }
 
-        if (!isCursorAtZeroPosition(editor) && isCursorBetweenCurly(editor))
-            manualFormat();
-        else
+        if (!isCursorAtZeroPosition(editor) && isCursorBetweenCurly(editor)) {
+            manualFormat();   
+        }
+        else {
             autoCompleteOrNewLine(editor);
+        }
     });
     context.subscriptions.push(disposable);
 }
 
 async function autoCompleteOrNewLine(editor: vscode.TextEditor) {
     var cursorPos = editor.document.offsetAt(editor.selection.active);
-            if (hasSuggestionOnEnter()) {
-                await vscode.commands.executeCommand("acceptSelectedSuggestion");
+    if (hasSuggestionOnEnter()) {
+        await execute("acceptSelectedSuggestion");
 
-                if (cursorPos != editor.document.offsetAt(editor.selection.active))
-                    return;
-            }
-            type('\n');
-            convertIndentation();
+        if (cursorPos !== editor.document.offsetAt(editor.selection.active)) {
+            return;   
+        }
+    }
+    await type('\n');
+    await convertIndentation();
 }
 
 export function deactivate() { }
 
-function isCursorAtZeroPosition(editor: vscode.TextEditor) {
-    const cursorPosition = editor.selection.active;
-    return cursorPosition.character == 0;
+
+// *************** //
+// Text formatting //
+// *************** //
+
+async function manualFormat() {
+    await move(CursorDirection.left);
+    await type('\n');
+    await move(CursorDirection.right);
+    await type('\n\n');
+    await move(CursorDirection.up);
+    await indent();
 }
 
-function isCursorBetweenCurly(editor: vscode.TextEditor) {
-    const nearCursor = getAdjacentText(editor);
-    return nearCursor[0] == "{" && nearCursor[1] == "}";
-
-    function getAdjacentText(editor: vscode.TextEditor) {
-        const cursorPosition = editor.selection.active;
-        return editor.document.getText(
-            vsRange(cursorPosition.line, cursorPosition.character - 1, cursorPosition.character + 1)
-        );
-
-        function vsRange(line: number, from: number, to: number) {
-            return new vscode.Range(line, from, line, to);
-        }
-    }
+async function indent() {
+    await type(hasAutoTab() ? '\t' : ' '.repeat(getTabSize()));
 }
 
-function manualFormat() {
-    move(Cursor.Left);
-    type('\n');
-    move(Cursor.Right);
-    type('\n\n');
-    move(Cursor.Up);
-    indent();
+async function convertIndentation() {
+    var action = hasAutoTab() ? "indentationToTabs" : "indentationToSpaces";
+    await execute("editor.action." + action);
 }
 
-function indent() {
-    if (hasAutoTab()) {
-        type('\t');
-    }
-    else {
-        const app = vscode.workspace.getConfiguration("editor").get<number>("tabSize");
-        var tabSize = 4;
 
-        if (typeof app === "number")
-            tabSize = app;
+// ******************* //
+// Commands shorthands //
+// ******************* //
 
-        for (var i = 0; i < tabSize; i++)
-            type(' ');
-    }
+async function move(dir: CursorDirection) {
+    await execute(dir);
 }
 
-function convertIndentation() {
-    if (hasAutoTab())
-        vscode.commands.executeCommand("editor.action.indentationToTabs");
-    else
-        vscode.commands.executeCommand("editor.action.indentationToSpaces");
+async function type(text: string) {
+    await vscode.commands.executeCommand('type', { "text": text });
+}
+
+async function execute(cmd: string) {
+    await vscode.commands.executeCommand(cmd);
+}
+
+
+// ************* //
+// Configuration //
+// ************* //
+
+function getTabSize() {
+    return getConfig().get<number>("editor.tabSize") ?? 4;
 }
 
 function hasAutoTab() {
-    return vscode.workspace.getConfiguration("cscurlyformatter").get("autoTabIndentation");
+    return getConfig().get<boolean>("cscurlyformatter.autoTabIndentation") ?? false;
 }
 
 function hasSuggestionOnEnter() {
-    return vscode.workspace.getConfiguration("editor").get("acceptSuggestionOnEnter");
+    return getConfig().get<boolean>("editor.acceptSuggestionOnEnter") ?? true;
 }
 
-function type(text: string) {
-    vscode.commands.executeCommand('type', { "text": text });
+function getConfig() {
+    return vscode.workspace.getConfiguration();
 }
 
-function move(dir: string) {
-    vscode.commands.executeCommand(dir);
+
+// ************** //
+// Helper methods //
+// ************** //
+
+function isCursorAtZeroPosition(editor: vscode.TextEditor) {
+    const cursorPosition = editor.selection.active;
+    return cursorPosition.character === 0;
+}
+
+function isCursorBetweenCurly(editor: vscode.TextEditor) {
+    const [leftChar, rightChar] = getAdjacentText(editor);
+    return leftChar === "{" && rightChar === "}";
+}
+
+function getAdjacentText(editor: vscode.TextEditor) {
+    const cursorPosition = editor.selection.active;
+    return editor.document.getText(
+        vsRange(cursorPosition.line, cursorPosition.character - 1, cursorPosition.character + 1)
+    );
+}
+
+function vsRange(line: number, from: number, to: number) {
+    return new vscode.Range(line, from, line, to);
 }
