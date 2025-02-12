@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.0.2] - 2025-02-12
+
+### Fixed
+
+- Formatting of isolated curly braces (#9).
+
+## [1.0.1] - 2025-02-02
+
+### Added
+
+- CHANGELOG.md
+
+### Changed
+
+- README.md
+
 ## [1.0.0] - 2025-02-02
 
 ### Added
@@ -17,6 +33,8 @@
 
 - Autocomplete on "enter" (#3).
 
-[unreleased]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.0...HEAD
+[unreleased]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/ironcutter24/cs-curly-formatter/compare/v0.0.7...v1.0.0
 [0.0.7]: https://github.com/ironcutter24/cs-curly-formatter/releases/tag/v0.0.7
