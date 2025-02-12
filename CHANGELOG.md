@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3] - 2025-02-02
+
+### Added
+
+- Build instructions
+- Ko-fi link
+
 ## [1.0.2] - 2025-02-12
 
 ### Fixed
@@ -33,7 +40,8 @@
 
 - Autocomplete on "enter" (#3).
 
-[unreleased]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.2...HEAD
+[unreleased]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/ironcutter24/cs-curly-formatter/compare/v0.0.7...v1.0.0
