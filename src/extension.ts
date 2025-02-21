@@ -11,6 +11,7 @@ import * as vscode from 'vscode';
 
 const extensionName = "cscurlyformatter";
 
+
 enum CursorDirection {
 	up = "cursorUp",
 	down = "cursorDown",
@@ -18,9 +19,30 @@ enum CursorDirection {
 	right = "cursorRight"
 }
 
+
+interface EditorSettings {
+	languages: string[];
+	tabSize: number;
+	autoTabIndentation: boolean;
+	acceptSuggestionOnEnter: boolean;
+}
+
+
+let cachedSettings: EditorSettings = getEditorSettings();
+
+
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
+	// Subscribe to the onDidChangeConfiguration event
+	const configChangeListener = vscode.workspace.onDidChangeConfiguration((event) => {
+		if (event.affectsConfiguration(extensionName) || event.affectsConfiguration("editor")) {
+			cachedSettings = getEditorSettings();
+		}
+	  });
+	  
+	  context.subscriptions.push(configChangeListener);
+	
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand(extensionName + ".formatCurlyBracesOnNewLine", () => {
 		const editor = vscode.window.activeTextEditor;
@@ -29,7 +51,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		if (canFormatCurlyBraces(editor)) {
-            formatCurlyBraces();
+			formatCurlyBraces();
 		}
 		else {
 			autoCompleteOrNewLine(editor);
@@ -40,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 async function autoCompleteOrNewLine(editor: vscode.TextEditor) {
 	var cursorPos = editor.document.offsetAt(editor.selection.active);
-	if (hasSuggestionOnEnter()) {
+	if (cachedSettings.acceptSuggestionOnEnter) {
 		await execute("acceptSelectedSuggestion");
 
 		if (cursorPos !== editor.document.offsetAt(editor.selection.active)) {
@@ -68,11 +90,11 @@ async function formatCurlyBraces() {
 }
 
 async function indent() {
-	await type(hasAutoTab() ? '\t' : ' '.repeat(getTabSize()));
+	await type(cachedSettings.autoTabIndentation ? '\t' : ' '.repeat(cachedSettings.tabSize));
 }
 
 async function convertIndentation() {
-	var action = hasAutoTab() ? "indentationToTabs" : "indentationToSpaces";
+	var action = cachedSettings.autoTabIndentation ? "indentationToTabs" : "indentationToSpaces";
 	await execute("editor.action." + action);
 }
 
@@ -98,24 +120,30 @@ async function execute(cmd: string) {
 // Configuration //
 // ************* //
 
-function getLanguages() {
-	return getConfig().get<string[]>(extensionName + ".languages") || [];
+function getEditorSettings(): EditorSettings {
+	let config = vscode.workspace.getConfiguration();
+	return {
+		languages: getLanguages(config),
+		tabSize: getTabSize(config),
+		autoTabIndentation: hasAutoTab(config),
+		acceptSuggestionOnEnter: hasSuggestionOnEnter(config)
+	};
 }
 
-function getTabSize() {
-	return getConfig().get<number>("editor.tabSize") ?? 4;
+function getLanguages(config : vscode.WorkspaceConfiguration) {
+	return config.get<string[]>(extensionName + ".languages") || [];
 }
 
-function hasAutoTab() {
-	return getConfig().get<boolean>(extensionName + ".autoTabIndentation") ?? false;
+function getTabSize(config : vscode.WorkspaceConfiguration) {
+	return config.get<number>("editor.tabSize") ?? 4;
 }
 
-function hasSuggestionOnEnter() {
-	return getConfig().get<boolean>("editor.acceptSuggestionOnEnter") ?? true;
+function hasAutoTab(config : vscode.WorkspaceConfiguration) {
+	return config.get<boolean>(extensionName + ".autoTabIndentation") ?? false;
 }
 
-function getConfig() {
-	return vscode.workspace.getConfiguration();
+function hasSuggestionOnEnter(config : vscode.WorkspaceConfiguration) {
+	return config.get<boolean>("editor.acceptSuggestionOnEnter") ?? true;
 }
 
 
@@ -124,14 +152,14 @@ function getConfig() {
 // ************** //
 
 function canFormatCurlyBraces(editor: vscode.TextEditor) {
-    return isActiveLanguage(editor)
-        && !isCursorAtZeroPosition(editor)
-        && isCursorBetweenCurly(editor)
-        && !isNewLine(editor);
+	return isActiveLanguage(editor)
+		&& !isCursorAtZeroPosition(editor)
+		&& isCursorBetweenCurly(editor)
+		&& !isNewLine(editor);
 }
 
 function isActiveLanguage(editor: vscode.TextEditor) {
-    return getLanguages().includes(editor.document.languageId);
+	return cachedSettings.languages.includes(editor.document.languageId);
 }
 
 function isCursorAtZeroPosition(editor: vscode.TextEditor) {
