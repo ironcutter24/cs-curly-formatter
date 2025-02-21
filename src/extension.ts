@@ -84,26 +84,30 @@ async function formatCurlyBraces(editor: vscode.TextEditor) {
     const line = editor.document.lineAt(cursorPosition.line).text;
 
     // Define the range where the changes should be applied
-    const beforeCurlies = new vscode.Range(cursorPosition.line, cursorPosition.character - 1, cursorPosition.line, cursorPosition.character - 1);
-    const betweenCurlies = new vscode.Range(cursorPosition.line, cursorPosition.character, cursorPosition.line, cursorPosition.character);
+    const editRange = new vscode.Range(
+		cursorPosition.line,
+		cursorPosition.character - 1,
+		cursorPosition.line,
+		cursorPosition.character + 1
+	);
     
 	// Detect indentation style
 	const indentLevel = getLineIndentationLevel(line);
+	const indent = getIndentation(indentLevel);
+	const extraIndent = getIndentation(indentLevel + cachedSettings.tabSize);
 	
     // Apply the newlines and indentation directly
     const edit = new vscode.WorkspaceEdit();
-    edit.replace(editor.document.uri, beforeCurlies, '\n' + getIndentation(indentLevel));
-    edit.replace(editor.document.uri, betweenCurlies, '\n\n' + getIndentation(indentLevel));
+    edit.replace(editor.document.uri, editRange, `\n${indent}{\n${extraIndent}\n${indent}}`);
 
     // Apply the edit to the document
     await vscode.workspace.applyEdit(edit);
 
-	// Move the cursor up a line
-	const newPosition = new vscode.Position(cursorPosition.line + 2, 0); // Move to the start of the previous line
+	// Reposition cursor
+	const targetLine = cursorPosition.line + 2;
+	const targetLineText = editor.document.lineAt(targetLine).text;
+	const newPosition = new vscode.Position(targetLine, targetLineText.length);
 	editor.selection = new vscode.Selection(newPosition, newPosition);
-
-    // Indent the line
-    await type(getIndentation(indentLevel + cachedSettings.tabSize));
 }
 
 function getLineIndentationLevel(lineText: string): number {
