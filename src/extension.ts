@@ -23,8 +23,8 @@ enum CursorDirection {
 interface EditorSettings {
 	languages: string[];
 	tabSize: number;
-	autoTabIndentation: boolean;
 	acceptSuggestionOnEnter: boolean;
+	insertSpaces: boolean;
 }
 
 
@@ -51,7 +51,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		if (canFormatCurlyBraces(editor)) {
-			formatCurlyBraces();
+			formatCurlyBraces(editor);
 		}
 		else {
 			autoCompleteOrNewLine(editor);
@@ -70,7 +70,6 @@ async function autoCompleteOrNewLine(editor: vscode.TextEditor) {
 		}
 	}
 	await type('\n');
-	await convertIndentation();
 }
 
 export function deactivate() { }
@@ -80,22 +79,41 @@ export function deactivate() { }
 // Text formatting //
 // *************** //
 
-async function formatCurlyBraces() {
-	await move(CursorDirection.left);
-	await type('\n');
-	await move(CursorDirection.right);
-	await type('\n\n');
-	await move(CursorDirection.up);
-	await indent();
+async function formatCurlyBraces(editor: vscode.TextEditor) {
+    const cursorPosition = editor.selection.active;
+    const line = editor.document.lineAt(cursorPosition.line).text;
+
+    // Define the range where the changes should be applied
+    const beforeCurlies = new vscode.Range(cursorPosition.line, cursorPosition.character - 1, cursorPosition.line, cursorPosition.character - 1);
+    const betweenCurlies = new vscode.Range(cursorPosition.line, cursorPosition.character, cursorPosition.line, cursorPosition.character);
+    
+	// Detect indentation style
+	const indentLevel = getLineIndentationLevel(line);
+	
+    // Apply the newlines and indentation directly
+    const edit = new vscode.WorkspaceEdit();
+    edit.replace(editor.document.uri, beforeCurlies, '\n' + getIndentation(indentLevel));
+    edit.replace(editor.document.uri, betweenCurlies, '\n\n' + getIndentation(indentLevel));
+
+    // Apply the edit to the document
+    await vscode.workspace.applyEdit(edit);
+
+	// Move the cursor up a line
+	const newPosition = new vscode.Position(cursorPosition.line + 2, 0); // Move to the start of the previous line
+	editor.selection = new vscode.Selection(newPosition, newPosition);
+
+    // Indent the line
+    await type(getIndentation(indentLevel + cachedSettings.tabSize));
 }
 
-async function indent() {
-	await type(cachedSettings.autoTabIndentation ? '\t' : ' '.repeat(cachedSettings.tabSize));
+function getLineIndentationLevel(lineText: string): number {
+    const indentation = lineText.match(/^(\s*)/); // Match leading whitespace
+    return indentation ? indentation[0].length : 0;
 }
 
-async function convertIndentation() {
-	var action = cachedSettings.autoTabIndentation ? "indentationToTabs" : "indentationToSpaces";
-	await execute(`editor.action.${action}`);
+function getIndentation(level: number) {
+	const indentChar = cachedSettings.insertSpaces ? ' ' : '\t';
+	return indentChar.repeat(level);
 }
 
 
@@ -125,8 +143,8 @@ function getEditorSettings(): EditorSettings {
 	return {
 		languages: getLanguages(config),
 		tabSize: getTabSize(config),
-		autoTabIndentation: hasAutoTab(config),
-		acceptSuggestionOnEnter: hasSuggestionOnEnter(config)
+		acceptSuggestionOnEnter: hasSuggestionOnEnter(config),
+		insertSpaces: getInsertSpaces(config),
 	};
 }
 
@@ -138,12 +156,12 @@ function getTabSize(config : vscode.WorkspaceConfiguration) {
 	return config.get<number>("editor.tabSize") ?? 4;
 }
 
-function hasAutoTab(config : vscode.WorkspaceConfiguration) {
-	return config.get<boolean>(`${extensionName}.autoTabIndentation`) ?? false;
-}
-
 function hasSuggestionOnEnter(config : vscode.WorkspaceConfiguration) {
 	return config.get<boolean>("editor.acceptSuggestionOnEnter") ?? true;
+}
+
+function getInsertSpaces(config : vscode.WorkspaceConfiguration) {
+	return config.get<boolean>("editor.insertSpaces") ?? true;
 }
 
 

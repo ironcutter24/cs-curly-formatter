@@ -31,11 +31,6 @@
   	  	"configuration": {
   	  	  	"title": "Curly Formatter",
   	  	  	"properties": {
-  	  	  	  	"cscurlyformatter.autoTabIndentation": {
-                    "description": "Enable automatic tab intendation style",
-  	  	  	  	  	"type": "boolean",
-  	  	  	  	  	"default": true
-  	  	  	  	},
                 "cscurlyformatter.languages": {
                     "description": "Languages to format",
                     "type": "array",
