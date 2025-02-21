@@ -1,46 +1,58 @@
 # Changelog
 
+## [1.0.4] - 2025-02-21
+
+### Changed
+
+- Improve formatting performance
+- Refactor helper methods
+
+### Fixed
+
+- Fix inconsistent new lines after formatting
+- Fix conflict with [Vim](https://marketplace.visualstudio.com/items?itemName=vscodevim.vim) extension
+
 ## [1.0.3] - 2025-02-02
 
-### Added
+### Changed
 
-- Build instructions
-- Ko-fi link
+- Update README
 
 ## [1.0.2] - 2025-02-12
 
 ### Fixed
 
-- Formatting of isolated curly braces (#9).
+- Formatting of isolated curly braces (#9)
 
 ## [1.0.1] - 2025-02-02
 
 ### Added
 
-- CHANGELOG.md
+- Add CHANGELOG
 
 ### Changed
 
-- README.md
+- Update README
 
 ## [1.0.0] - 2025-02-02
 
 ### Added
 
-- Support for multiple languages.
-- Settings to configure active languages.
+- Support for multiple languages
+- Settings to configure active languages
 
 ### Changed
 
-- Upgrade dependencies.
+- Upgrade dependencies
 
 ## [0.0.7] - 2023-01-04
 
 ### Fixed
 
-- Autocomplete on "enter" (#3).
+- Autocomplete on "enter" (#3)
 
-[unreleased]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.3...HEAD
+[unreleased]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.4...HEAD
+[1.0.4]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.0...v1.0.1
