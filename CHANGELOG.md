@@ -7,10 +7,14 @@
 - Improve formatting performance
 - Refactor helper methods
 
+### Removed
+
+- Remove option to automatically convert indentation to tabs, which should be configured in VSCode settings (#10)
+
 ### Fixed
 
-- Fix inconsistent new lines after formatting
-- Fix conflict with [Vim](https://marketplace.visualstudio.com/items?itemName=vscodevim.vim) extension
+- Fix inconsistent new lines after formatting (#9)
+- Fix conflict with [Vim](https://marketplace.visualstudio.com/items?itemName=vscodevim.vim) extension (#7)
 
 ## [1.0.3] - 2025-02-02
 
