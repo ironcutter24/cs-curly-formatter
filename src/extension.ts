@@ -127,11 +127,11 @@ function canFormatCurlyBraces(editor: vscode.TextEditor) {
     return isActiveLanguage(editor)
         && !isCursorAtZeroPosition(editor)
         && isCursorBetweenCurly(editor)
-        && !isNewLine(editor)
+        && !isNewLine(editor);
 }
 
 function isActiveLanguage(editor: vscode.TextEditor) {
-    return getLanguages().includes(editor.document.languageId)
+    return getLanguages().includes(editor.document.languageId);
 }
 
 function isCursorAtZeroPosition(editor: vscode.TextEditor) {
