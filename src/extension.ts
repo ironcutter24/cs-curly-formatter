@@ -44,7 +44,7 @@ export function activate(context: vscode.ExtensionContext) {
 	  context.subscriptions.push(configChangeListener);
 	
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand(extensionName + ".formatCurlyBracesOnNewLine", () => {
+	let disposable = vscode.commands.registerCommand(`${extensionName}.formatCurlyBracesOnNewLine`, () => {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			return false;            
@@ -95,7 +95,7 @@ async function indent() {
 
 async function convertIndentation() {
 	var action = cachedSettings.autoTabIndentation ? "indentationToTabs" : "indentationToSpaces";
-	await execute("editor.action." + action);
+	await execute(`editor.action.${action}`);
 }
 
 
@@ -131,7 +131,7 @@ function getEditorSettings(): EditorSettings {
 }
 
 function getLanguages(config : vscode.WorkspaceConfiguration) {
-	return config.get<string[]>(extensionName + ".languages") || [];
+	return config.get<string[]>(`${extensionName}.languages`) || [];
 }
 
 function getTabSize(config : vscode.WorkspaceConfiguration) {
@@ -139,7 +139,7 @@ function getTabSize(config : vscode.WorkspaceConfiguration) {
 }
 
 function hasAutoTab(config : vscode.WorkspaceConfiguration) {
-	return config.get<boolean>(extensionName + ".autoTabIndentation") ?? false;
+	return config.get<boolean>(`${extensionName}.autoTabIndentation`) ?? false;
 }
 
 function hasSuggestionOnEnter(config : vscode.WorkspaceConfiguration) {
@@ -163,36 +163,26 @@ function isActiveLanguage(editor: vscode.TextEditor) {
 }
 
 function isCursorAtZeroPosition(editor: vscode.TextEditor) {
-	const cursorPosition = editor.selection.active;
-	return cursorPosition.character === 0;
+	return editor.selection.active.character === 0;
 }
 
 function isCursorBetweenCurly(editor: vscode.TextEditor) {
-	const [leftChar, rightChar] = getAdjacentText(editor);
-	return leftChar === "{" && rightChar === "}";
-}
-
-function getAdjacentText(editor: vscode.TextEditor) {
 	const cursorPosition = editor.selection.active;
-	return editor.document.getText(
-		vsRange(cursorPosition.line, cursorPosition.character - 1, cursorPosition.character + 1)
-	);
+	const line = editor.document.lineAt(cursorPosition.line).text;
+	
+	const leftChar = line[cursorPosition.character - 1];
+	const rightChar = line[cursorPosition.character];
+
+	return leftChar === "{" && rightChar === "}";
 }
 
 function isNewLine(editor: vscode.TextEditor) { 
 	const cursorPosition = editor.selection.active;
-	var lineRange = vsRange(cursorPosition.line, 0, cursorPosition.character - 1);
-	var line = editor.document.getText(lineRange);
-	
-	for (var i = 0; i < line.length; i++) {
-		if (line[i] !== ' ' && line[i] !== '\t') {
-			return false;
-		}
-	}
-	
-	return true;
+	const line = editor.document.lineAt(cursorPosition.line).text;
+
+	return isWhitespace(line.substring(0, cursorPosition.character - 1));
 }
 
-function vsRange(line: number, from: number, to: number) {
-	return new vscode.Range(line, from, line, to);
+function isWhitespace(text: string) {
+	return !text.trim();
 }
