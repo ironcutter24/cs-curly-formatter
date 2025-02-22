@@ -81,7 +81,7 @@ export function deactivate() { }
 
 async function formatCurlyBraces(editor: vscode.TextEditor) {
     const cursorPosition = editor.selection.active;
-    const line = editor.document.lineAt(cursorPosition.line).text;
+    const line = editor.document.lineAt(cursorPosition.line);
 
     // Define the range where the changes should be applied
     const editRange = new vscode.Range(
@@ -91,14 +91,18 @@ async function formatCurlyBraces(editor: vscode.TextEditor) {
 		cursorPosition.character + 1
 	);
     
-	// Detect indentation style
-	const indentLevel = getLineIndentationLevel(line);
-	const indent = getIndentation(indentLevel);
-	const extraIndent = getIndentation(indentLevel + cachedSettings.tabSize);
-	
+	// Detect existing indentation in the current line
+    const currentIndentMatch = line.text.match(/^(\s*)/);
+	const indent = currentIndentMatch ? currentIndentMatch[0] : "";
+
+    // Determine one indentation step
+    const indentUnit = cachedSettings.insertSpaces ? " ".repeat(cachedSettings.tabSize) : "\t";
+
+	const newLine = `\n${indent}{\n${indent + indentUnit}\n${indent}}`;
+
     // Apply the newlines and indentation directly
     const edit = new vscode.WorkspaceEdit();
-    edit.replace(editor.document.uri, editRange, `\n${indent}{\n${extraIndent}\n${indent}}`);
+    edit.replace(editor.document.uri, editRange, newLine);
 
     // Apply the edit to the document
     await vscode.workspace.applyEdit(edit);
