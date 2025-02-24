@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return false;            
 		}
 
-		if (canFormatCurlyBraces(editor)) {
+		if (shouldFormatCurlyBraces(editor)) {
 			formatCurlyBraces(editor);
 		}
 		else {
@@ -61,15 +61,26 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 async function autoCompleteOrNewLine(editor: vscode.TextEditor) {
-	var cursorPos = editor.document.offsetAt(editor.selection.active);
-	if (cachedSettings.acceptSuggestionOnEnter) {
-		await execute("acceptSelectedSuggestion");
-
-		if (cursorPos !== editor.document.offsetAt(editor.selection.active)) {
-			return;   
+	const line = editor.document.lineAt(editor.selection.active.line).text;
+	const indent = getIndentation(line);
+	const didAutocomplete = cachedSettings.acceptSuggestionOnEnter && await acceptSelectedSuggestionAsync(editor);
+	
+	if (!didAutocomplete) {
+		let insertText = '\n';
+		if (isActiveLanguage(editor)) {
+			insertText = '\n' + indent;
 		}
+		
+		editor.edit(editBuilder => {
+			editBuilder.insert(editor.selection.active, insertText);
+		});
 	}
-	await type('\n');
+}
+
+async function acceptSelectedSuggestionAsync(editor: vscode.TextEditor) {
+	var cursorPos = editor.document.offsetAt(editor.selection.active);
+	await execute("acceptSelectedSuggestion");
+	return cursorPos !== editor.document.offsetAt(editor.selection.active);
 }
 
 export function deactivate() { }
@@ -81,28 +92,28 @@ export function deactivate() { }
 
 async function formatCurlyBraces(editor: vscode.TextEditor) {
     const cursorPosition = editor.selection.active;
-    const line = editor.document.lineAt(cursorPosition.line);
+    const line = editor.document.lineAt(cursorPosition.line).text;
+
+	// Get the current indentation
+	const indent = getIndentation(line);
+
+	// Determine one indentation step
+    const indentUnit = cachedSettings.insertSpaces ? " ".repeat(cachedSettings.tabSize) : "\t";
+
+	// Format new line to insert
+	const newLine = `\n${indent}{\n${indent + indentUnit}\n${indent}}`;
 
     // Define the range where the changes should be applied
-    const editRange = new vscode.Range(
+    const rangeToEdit = new vscode.Range(
 		cursorPosition.line,
 		cursorPosition.character - 1,
 		cursorPosition.line,
 		cursorPosition.character + 1
 	);
-    
-	// Detect existing indentation in the current line
-    const currentIndentMatch = line.text.match(/^(\s*)/);
-	const indent = currentIndentMatch ? currentIndentMatch[0] : "";
-
-    // Determine one indentation step
-    const indentUnit = cachedSettings.insertSpaces ? " ".repeat(cachedSettings.tabSize) : "\t";
-
-	const newLine = `\n${indent}{\n${indent + indentUnit}\n${indent}}`;
 
     // Apply the newlines and indentation directly
     const edit = new vscode.WorkspaceEdit();
-    edit.replace(editor.document.uri, editRange, newLine);
+    edit.replace(editor.document.uri, rangeToEdit, newLine);
 
     // Apply the edit to the document
     await vscode.workspace.applyEdit(edit);
@@ -114,14 +125,18 @@ async function formatCurlyBraces(editor: vscode.TextEditor) {
 	editor.selection = new vscode.Selection(newPosition, newPosition);
 }
 
-function getLineIndentationLevel(lineText: string): number {
-    const indentation = lineText.match(/^(\s*)/); // Match leading whitespace
-    return indentation ? indentation[0].length : 0;
+async function editRange(editor: vscode.TextEditor, text: string, range: vscode.Range) {
+	// Apply the newlines and indentation directly
+    const edit = new vscode.WorkspaceEdit();
+    edit.replace(editor.document.uri, range, text);
+
+    // Apply the edit to the document
+    await vscode.workspace.applyEdit(edit);
 }
 
-function getIndentation(level: number) {
-	const indentChar = cachedSettings.insertSpaces ? ' ' : '\t';
-	return indentChar.repeat(level);
+function getIndentation(line: string): string {
+    const currentIndentMatch = line.match(/^(\s*)/);
+	return currentIndentMatch ? currentIndentMatch[0] : "";
 }
 
 
@@ -177,7 +192,7 @@ function getInsertSpaces(config : vscode.WorkspaceConfiguration) {
 // Helper methods //
 // ************** //
 
-function canFormatCurlyBraces(editor: vscode.TextEditor) {
+function shouldFormatCurlyBraces(editor: vscode.TextEditor) {
 	return isActiveLanguage(editor)
 		&& !isCursorAtZeroPosition(editor)
 		&& isCursorBetweenCurly(editor)
