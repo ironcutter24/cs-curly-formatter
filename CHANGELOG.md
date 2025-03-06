@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.3] - 2025-03-06
+
+### Removed
+
+- Remove download and rating badges because they often exceed the API call limit
+
 ## [1.1.2] - 2025-02-25
 
 ### Fixed
@@ -67,7 +73,8 @@
 
 - Autocomplete on "enter" (#3)
 
-[unreleased]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.1.2...HEAD
+[unreleased]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.0.3...v1.1.0
