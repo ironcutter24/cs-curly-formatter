@@ -1,8 +1,14 @@
 # Changelog
 
+## [1.1.5] - 2025-04-13
+
+### Changed
+
+- Update package description
+
 ## [1.1.4] - 2025-04-13
 
-## Changed
+### Changed
 
 - Update README
 
@@ -79,7 +85,8 @@
 
 - Autocomplete on "enter" (#3)
 
-[unreleased]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.1.4...HEAD
+[unreleased]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.1.5...HEAD
+[1.1.5]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/ironcutter24/cs-curly-formatter/compare/v1.1.1...v1.1.2
