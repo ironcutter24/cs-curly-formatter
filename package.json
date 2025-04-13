@@ -1,7 +1,7 @@
 {
   	"name": "cscurlyformatter",
   	"displayName": "Curly Formatter",
-  	"description": "A language-agnostic VS Code extension that auto-formats curly brackets on newline and keeps tab indentation.",
+  	"description": "Formats curly brackets on newline and keeps tab indentation.",
   	"version": "1.1.4",
   	"publisher": "Ironcutter24",
   	"icon": "icon.png",
